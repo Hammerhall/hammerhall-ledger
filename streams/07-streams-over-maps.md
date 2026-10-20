@@ -437,7 +437,7 @@ List<ItemShare> shares = top3.stream()
 Hammerhall, на фильмах и странах мира. Задачи бесплатны, нужен только
 вход:
 
-* [«Найти год, в котором вышло больше всего фильмов»](https://hammerhall.io/forge/stream-forge/task/MovCode0031);
+* [«Спор старых киноманов»](https://hammerhall.io/forge/stream-forge/task/MovCode0031);
 * [«Найти название самого популярного жанра по количеству фильмов»](https://hammerhall.io/forge/stream-forge/task/MovCode0032);
 * [«Найти топ-5 самых населённых городов мира вместе со страной и континентом»](https://hammerhall.io/forge/stream-forge/task/WldCode0043).
 

@@ -536,7 +536,7 @@ log₂ 8000 ≈ 13 — сколько раз 8000 можно поделить п
 на платформе Hammerhall, на фильмах. Задача бесплатна, нужен только
 вход:
 
-* [«Найти все фильмы, у которых набор жанров строго равен набору: Drama и Comedy»](https://hammerhall.io/forge/stream-forge/task/MovMind0006).
+* [«Вечер в провинциальном театре»](https://hammerhall.io/forge/stream-forge/task/MovMind0006).
 
 ## Что дальше
 

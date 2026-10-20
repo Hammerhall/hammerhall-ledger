@@ -416,9 +416,9 @@ for (int i = 1; i < orders.size(); i++) {
 стримом и циклом, — в кузнице Stream Forge на платформе Hammerhall.
 Все три бесплатны, нужен только вход:
 
-* [«Найти континент с максимальной плотностью населения»](https://hammerhall.io/forge/stream-forge/task/WldMind0022);
-* [«Построить последовательность роста населения»](https://hammerhall.io/forge/stream-forge/task/WldMind0018);
-* [«Получить „временной срез“ базы — N самых ранних и N самых поздних фильмов»](https://hammerhall.io/forge/stream-forge/task/MovMind0022).
+* [«Экспедиция картографа»](https://hammerhall.io/forge/stream-forge/task/WldMind0022);
+* [«Записки демографа»](https://hammerhall.io/forge/stream-forge/task/WldMind0018);
+* [«Юбилейный вечер киноклуба»](https://hammerhall.io/forge/stream-forge/task/MovMind0022).
 
 ## Что дальше
 

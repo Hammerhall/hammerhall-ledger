@@ -458,11 +458,11 @@ Optional[8] Optional.empty
 Hammerhall, на фильмах и странах мира. Первые задачи бесплатны, нужен
 только вход:
 
-* [«Получить список названий всех стран, отсортированный в алфавитном порядке»](https://hammerhall.io/forge/stream-forge/task/WldCode0003);
-* [«Получить список всех фильмов, отсортированных по году выхода»](https://hammerhall.io/forge/stream-forge/task/MovCode0009);
+* [«Флаги вдоль набережной»](https://hammerhall.io/forge/stream-forge/task/WldCode0003);
+* [«Пыльные коробки архива»](https://hammerhall.io/forge/stream-forge/task/MovCode0009);
 * [«Найти самый ранний фильм в базе»](https://hammerhall.io/forge/stream-forge/task/MovCode0011);
-* [«Получить список стран, отсортированный сначала по континенту, затем по названию»](https://hammerhall.io/forge/stream-forge/task/WldCode0013);
-* [«Найти страну с наибольшей площадью»](https://hammerhall.io/forge/stream-forge/task/WldCode0006).
+* [«Стенд в школьном коридоре»](https://hammerhall.io/forge/stream-forge/task/WldCode0013);
+* [«Спор у глобуса»](https://hammerhall.io/forge/stream-forge/task/WldCode0006).
 
 ## Что дальше
 

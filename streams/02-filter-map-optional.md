@@ -576,9 +576,9 @@ orElseGet: Егор
 и ссылки на методы — в кузнице Stream Forge на платформе Hammerhall,
 на фильмах. Первые задачи бесплатны, нужен только вход:
 
-* [«Получить первые N фильмов из базы»](https://hammerhall.io/forge/stream-forge/task/MovCode0003);
-* [«Найти первый фильм, вышедший после указанного года»](https://hammerhall.io/forge/stream-forge/task/MovCode0005);
-* [«Найти все фильмы, у которых больше одного жанра»](https://hammerhall.io/forge/stream-forge/task/MovCode0007);
+* [«Витрина видеосалона»](https://hammerhall.io/forge/stream-forge/task/MovCode0003);
+* [«Долгожданная премьера»](https://hammerhall.io/forge/stream-forge/task/MovCode0005);
+* [«Ни рыба ни мясо»](https://hammerhall.io/forge/stream-forge/task/MovCode0007);
 * [«Найти все фильмы заданного жанра»](https://hammerhall.io/forge/stream-forge/task/MovCode0014);
 * [«Проверить, есть ли в базе хотя бы один фильм указанного жанра»](https://hammerhall.io/forge/stream-forge/task/MovCode0013).
 

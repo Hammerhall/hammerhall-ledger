@@ -381,9 +381,9 @@ List<String> noCard = orders.stream()
 на платформе Hammerhall. Первые задачи бесплатны, нужен только вход:
 
 * [«Найти столицу с наибольшей численностью населения»](https://hammerhall.io/forge/stream-forge/task/WldCode0015);
-* [«Сопоставить странам их города-столицы»](https://hammerhall.io/forge/stream-forge/task/WldCode0026);
-* [«Найти страны, где население столицы составляет больше 30% населения страны»](https://hammerhall.io/forge/stream-forge/task/WldMind0020);
-* [«Найти страны, где самый большой город не является столицей»](https://hammerhall.io/forge/stream-forge/task/WldMind0021).
+* [«Конверты в посольства»](https://hammerhall.io/forge/stream-forge/task/WldCode0026);
+* [«Жалоба губернатора»](https://hammerhall.io/forge/stream-forge/task/WldMind0020);
+* [«Спор двух городов»](https://hammerhall.io/forge/stream-forge/task/WldMind0021).
 
 ## Что дальше
 

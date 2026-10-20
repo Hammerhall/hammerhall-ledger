@@ -385,10 +385,10 @@ true
 Stream Forge на платформе Hammerhall, на фильмах и странах мира. Первые
 задачи бесплатны, нужен только вход:
 
-* [«Получить список всех городов мира»](https://hammerhall.io/forge/stream-forge/task/WldCode0005);
+* [«Справочник почтальона»](https://hammerhall.io/forge/stream-forge/task/WldCode0005);
 * [«Получить список названий столиц всех стран»](https://hammerhall.io/forge/stream-forge/task/WldCode0014);
 * [«Получить список всех режиссёров фильмов без создания промежуточных коллекций»](https://hammerhall.io/forge/stream-forge/task/MovCode0019);
-* [«Получить множество всех континентов»](https://hammerhall.io/forge/stream-forge/task/WldCode0002).
+* [«Атлас для первоклассника»](https://hammerhall.io/forge/stream-forge/task/WldCode0002).
 
 ## Что дальше
 

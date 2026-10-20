@@ -442,10 +442,10 @@ editable.add("Егор");
 Stream Forge на платформе Hammerhall, на фильмах и странах мира. Первые
 задачи бесплатны, нужен только вход:
 
-* [«Получить список всех названий фильмов»](https://hammerhall.io/forge/stream-forge/task/MovCode0001);
-* [«Найти все фильмы, вышедшие после указанного года»](https://hammerhall.io/forge/stream-forge/task/MovCode0002);
-* [«Посчитать количество фильмов, вышедших в годы, которые не являются високосными»](https://hammerhall.io/forge/stream-forge/task/MovCode0004);
-* [«Получить список стран с населением более 50 миллионов человек»](https://hammerhall.io/forge/stream-forge/task/WldCode0001).
+* [«Программка для зрителей»](https://hammerhall.io/forge/stream-forge/task/MovCode0001);
+* [«Новинки проката»](https://hammerhall.io/forge/stream-forge/task/MovCode0002);
+* [«Календарь киномеханика»](https://hammerhall.io/forge/stream-forge/task/MovCode0004);
+* [«Заседание в Женеве»](https://hammerhall.io/forge/stream-forge/task/WldCode0001).
 
 ## Что дальше
 

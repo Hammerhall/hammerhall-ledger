@@ -433,7 +433,7 @@ Exception in thread "main" java.lang.ArithmeticException: integer overflow
 
 * [«Вычислить суммарную численность населения всех городов мира»](https://hammerhall.io/forge/stream-forge/task/WldCode0009);
 * [«Найти минимальное, максимальное и среднее население стран мира»](https://hammerhall.io/forge/stream-forge/task/WldCode0021);
-* [«Найти страны, где сумма населения городов больше населения страны»](https://hammerhall.io/forge/stream-forge/task/WldMind0019).
+* [«Ошибка переписчика»](https://hammerhall.io/forge/stream-forge/task/WldMind0019).
 
 ## Что дальше
 

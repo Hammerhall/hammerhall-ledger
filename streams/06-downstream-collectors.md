@@ -383,9 +383,9 @@ IO.println("крупные заказы дали " + bigShare + "% выручк�
 `maxBy` внутри группы — в кузнице Stream Forge на платформе Hammerhall,
 на странах мира. Задачи бесплатны, нужен только вход:
 
-* [«Для каждого континента построить список стран с населением более 50 миллионов»](https://hammerhall.io/forge/stream-forge/task/WldCode0038);
+* [«Региональные саммиты»](https://hammerhall.io/forge/stream-forge/task/WldCode0038);
 * [«Найти среднее население городов по каждому континенту»](https://hammerhall.io/forge/stream-forge/task/WldCode0044);
-* [«Найти самый густонаселённый город на каждом континенте»](https://hammerhall.io/forge/stream-forge/task/WldCode0053).
+* [«Открытки туриста»](https://hammerhall.io/forge/stream-forge/task/WldCode0053).
 
 ## Что дальше
 
