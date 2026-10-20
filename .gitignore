@@ -1,0 +1,8 @@
+build/
+target/
+__pycache__/
+/.idea/.gitignore
+/.idea/hammerhall-ledger.iml
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/vcs.xml

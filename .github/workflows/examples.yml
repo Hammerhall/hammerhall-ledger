@@ -1,0 +1,40 @@
+name: Примеры статей
+
+# Код из «Пример целиком» каждой статьи собирается и запускается.
+# Красный прогон — статья на сайт не выходит.
+
+on:
+  push:
+    paths:
+      - "articles/**"
+      - "testing/**"
+      - "examples/**"
+      - "tools/**"
+      - ".github/workflows/examples.yml"
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  examples:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+
+      - name: Разложить примеры из статей
+        run: python3 tools/extract_examples.py
+
+      - name: Собрать и проверить
+        run: bash tools/run_examples.sh
