@@ -175,7 +175,7 @@ public class Incident {
 вместо `fixed_at`, — и приложение не поднимется:
 
 ```
-Schema-validation: missing column [fixed] in table [game_day.incident]
+Schema validation: missing column [fixed] in table [game_day.incident]
 ```
 
 Упасть при старте лучше, чем на первом запросе посреди игрового дня.

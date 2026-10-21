@@ -167,9 +167,9 @@ expect_contains "$(cat "$v/$MAIN/Incident.java")" '@Column(name = "fixed")' "в 
 if variant_jar "$v"; then
     out=$(app "$v/$JAR"); code=$?
     expect_failed "$code" "java -jar с опечаткой в имени столбца"
-    expect_contains "$out" "Schema-validation: missing column [fixed] in table [game_day.incident]" \
+    expect_contains "$out" "Schema validation: missing column [fixed] in table [game_day.incident]" \
         "текст ошибки — как в статье"
-    show "$(grep -m 1 -o 'Schema-validation: missing column [^]]*] in table [^]]*]' <<<"$out")"
+    show "$(grep -m 1 -o 'Schema validation: missing column [^]]*] in table [^]]*]' <<<"$out")"
 else
     fail "вариант column-typo не собрался"
     show "$(tail -n 30 "$v/mvn.log")"
