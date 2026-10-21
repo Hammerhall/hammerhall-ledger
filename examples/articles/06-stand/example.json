@@ -1,4 +1,4 @@
 {
   "article": "articles/06-stand.md",
-  "base": "articles/02-spring-boot-4"
+  "base": "articles/05-full-endpoint"
 }

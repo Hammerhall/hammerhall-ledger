@@ -1,13 +1,15 @@
 # Стенд своими руками: Docker, образ, compose, `.env`, скрипты bash
 
-> «От Spring к системе» · статья 6 · читать минут 30
+> «От Spring к системе» · статья 6 · читать минут 35
 >
-> **Для кого.** Ты прочитал статьи 0–2 и завёл песочницу `game-day`.
-> Bash знаешь на уровне `cd` и `ls`. Docker поставим по ходу.
+> **Для кого.** Ты прочитал статьи 0–5, и у тебя есть песочница
+> `game-day` после статьи 5: Postgres в контейнере, ручки журнала, вход
+> по Basic. Docker стоит со статьи 3а. Bash знаешь на уровне `cd` и `ls`.
 >
 > **Что будет.** Как устроены образ и контейнер; Dockerfile и compose
-> для песочницы — с причиной каждой строки; два скрипта bash, которые
-> не врут, когда что-то сломалось.
+> для песочницы с базой — с причиной каждой строки; почему проверку
+> здоровья охрана пускает без пароля; два скрипта bash, которые не врут,
+> когда что-то сломалось.
 >
 > **Откуда статья.** Раздел «Буткемп / Лаборатория» — о том, как пишут
 > код команды Hammerhall: буткемп работает в открытых репозиториях,
@@ -19,9 +21,12 @@
 
 ## Зачем стенд в контейнерах
 
-В статье 2 ты запускал песочницу через `java -jar` с профилем `stand`
-и переменной `GAME_DAY_STOP_WORD`. У коллеги JDK 21, переменная не
-задана, а порт 8080 занят — и вот «у меня работает, а у тебя нет».
+Сейчас песочница поднимается в два приёма (статьи 3а–5): база — длинной
+командой `docker run`, приложение — `java -jar` с тремя переменными
+`SPRING_DATASOURCE_*`, а с профилем `stand` — ещё и с
+`GAME_DAY_STOP_WORD` (статья 2). Забыл переменную — приложение
+не поднялось. У коллеги JDK 21, а порт 5432 занят его собственным
+Postgres — и вот «у меня работает, а у тебя нет».
 
 Стенд рабочего сервиса — обычно несколько программ: база данных, брокер
 сообщений, двойники соседних сервисов (программы вроде WireMock, которые
@@ -32,8 +37,9 @@
 
 В рабочем проекте такие файлы пишут сами джуны, по задачам с кодом
 и шагами. Здесь — как это устроено и что сломается, если сделать иначе.
-Учимся на стенде для песочницы `game-day`: программа в нём одна, зато
-у каждой строки есть причина. Журнал игрового дня — учебный пример.
+Учимся на стенде для песочницы `game-day`: программ в нём две — база
+и приложение, зато у каждой строки есть причина. Журнал игрового дня —
+учебный пример.
 
 ---
 
@@ -41,21 +47,14 @@
 
 ### Docker
 
-**Docker** — программа, которая запускает другие программы
-в изолированных коробках — контейнерах. На Windows и macOS его ставят
-как **Docker Desktop** (docs.docker.com, раздел Get Docker), на Linux —
-Docker Engine. Поставь, запусти Docker Desktop и проверь в консоли:
-
-```bash
-docker version
-```
-
-В ответе две части: `Client` — команда `docker`, которой ты пользуешься,
-и `Server` — сам Docker, который запускает контейнеры. Нет части
-`Server`, а вместо неё ошибка подключения — Docker Desktop не запущен.
-Контейнер здесь — Docker, не Spring.
+Docker Desktop ты поставил в статье 3а — ради базы — и до сих пор
+запускал чужой образ, `postgres:17-alpine`. Теперь соберёшь свой. Перед
+работой запусти Docker Desktop: `docker version` должен показать обе
+части, `Client` и `Server` (статья 3а).
 
 ### Образ и контейнер
+
+В статье 3а об этом было в двух словах, теперь подробнее.
 
 **Образ** (image) — неизменный снимок программы со всем, что ей нужно
 для запуска: маленькая основа Linux, Java, твой `.jar`. **Контейнер** —
@@ -95,6 +94,8 @@ docker.io/library/eclipse-temurin:25-jre-alpine
 
 Реестр и пространство обычно не пишут. **Тег** — метка после
 двоеточия, обычно версия. Нет тега — Docker подставит `latest`.
+`postgres:17-alpine` из статьи 3а читается так же: Postgres 17 на основе
+alpine.
 
 ⚠️ `latest` — не «самая свежая версия», а тег по умолчанию, который
 издатель двигает куда хочет: сейчас `eclipse-temurin:latest` — JDK 25
@@ -107,35 +108,85 @@ Java без правки в репозитории. Поэтому
 
 ## Часть 2. Образ песочницы
 
-### Что будем проверять: веб и Actuator
+### Actuator: «ты жив?»
 
-Сейчас песочница записывает происшествие и завершается (статья 2).
-Стенду нужно приложение, которое работает и отвечает на «ты жив?», —
-Actuator из статьи 2. Добавь в `pom.xml`
-песочницы два стартера:
+Стенду нужно приложение, которое отвечает на «ты жив?», — Actuator
+из статьи 2. Веб в песочнице уже есть (статья 4), добавь в `pom.xml`
+один стартер:
 
 ```xml
-<dependency>                                   <!-- веб: Spring MVC и Tomcat -->
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-webmvc</artifactId>
-</dependency>
 <dependency>                                   <!-- служебные адреса, среди них /actuator/health -->
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-actuator</artifactId>
 </dependency>
 ```
 
-Код не меняется. Запусти `GameDayApplication` из IDE: теперь оно
-не завершается — сервер ждёт запросов. Открой
-`http://127.0.0.1:8080/actuator/health`:
+Java-код пока не трогаем. Собери и запусти песочницу, как в статье 5: база —
+`docker run` из статьи 3а, три переменные `SPRING_DATASOURCE_*`, затем
+`./mvnw package` и `java -jar target/game-day-0.0.1-SNAPSHOT.jar`.
+Спроси здоровье — в другом окне консоли:
+
+```bash
+curl -i http://127.0.0.1:8080/actuator/health
+```
+
+```
+HTTP/1.1 401
+WWW-Authenticate: Basic realm="Realm"
+…
+
+{"timestamp":"…","status":401,"error":"Unauthorized","path":"/actuator/health"}
+```
+
+Не вошёл — `401`. Охрана из статьи 5 сработала как задумано: адреса
+`/actuator/health` в её правилах нет, и его закрыл
+`anyRequest().denyAll()`.
+
+### 🔴 Здоровье — без входа, остальное — со входом
+
+Кто спрашивает «ты жив?»? Docker — проверкой здоровья (часть 3), скрипт
+стенда (часть 4), на боевом — программа, которая следит за сервисами
+и перезапускает упавшие. Пароля ни у кого из них нет, и раздавать его
+незачем: ответ health — одно слово, `UP` или `DOWN`, без данных журнала.
+Поэтому health открывают без входа. Одна строка в `SecurityConfig`
+из статьи 5:
+
+```java
+http.authorizeHttpRequests(access -> access
+        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+        .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()        // здоровье — без входа
+        .requestMatchers(HttpMethod.GET, "/game-day/incidents").hasRole("admin")
+        …
+```
+
+`permitAll()` — пускать всех, даже не вошедших. Охрана читает правила
+по порядку (статья 5), так что новое правило стоит выше `denyAll`. Файл
+целиком — в «Пример целиком». Пересобери, запусти и спроси снова, теперь
+без `-i`:
 
 ```
 {"groups":["liveness","readiness"],"status":"UP"}
 ```
 
 `"status":"UP"` — «жив»; `groups` — пробы из статьи 2, в Boot 4 они
-включены сами. Больное приложение ответит статусом `503`. По вебу
-Actuator открывает только `health`.
+включены сами. Больное приложение ответит `"status":"DOWN"` со статусом
+`503` — например, когда не может достучаться до базы: health спрашивает
+и её. Это увидишь в части 4.
+
+Открыт ровно один адрес. Пробы из `groups` —
+`/actuator/health/liveness` и `…/readiness` — и сам `/actuator`, список
+адресов Actuator, без входа ответят `401`: стенду хватит общего health.
+Адреса Actuator рассказывают о приложении изнутри — настройки, бины,
+метрики. По вебу Boot сейчас открывает только health, но завтра кто-то
+включит ещё один адрес, и правило на весь `/actuator/**` открыло бы его
+без входа.
+
+Забудешь эту строку — стенд не поднимется: Docker спросит здоровье без
+пароля и получит `401`. Как это выглядит — в части 4.
+
+💡 Тест периметра из статьи 5 health не видит: он сверяет ручки наших
+контроллеров, а health — адрес Actuator. Адрес, открытый без входа,
+сверяет ревьюер — по `SecurityConfig`.
 
 ### Dockerfile — рецепт образа
 
@@ -251,7 +302,7 @@ stand/
 
 ### Собрать и запустить руками
 
-Из папки песочницы, по одной команде:
+Из папки песочницы:
 
 ```bash
 docker build -t game-day:local .
@@ -260,43 +311,60 @@ docker build -t game-day:local .
 `-t` — имя и тег (`local` — «собран у меня»), точка — контекст: текущая
 папка. Первая сборка — минуты, вторая — секунды.
 
+Запусти контейнер так же, как в статье 5 запускал `java -jar`: те же три
+переменные, только флагами `-e`. База из статьи 5 пусть работает:
+
 ```bash
-docker run -d --rm --name game-day-try -p 127.0.0.1:8088:8080 game-day:local
+docker run -d --name game-day-try -p 127.0.0.1:8088:8080 \
+    -e SPRING_DATASOURCE_URL=jdbc:postgresql://127.0.0.1:5432/postgres \
+    -e SPRING_DATASOURCE_USERNAME=postgres -e SPRING_DATASOURCE_PASSWORD=game-day-local \
+    game-day:local
 ```
 
-`-d` — в фоне; `--rm` — удалить после остановки; `--name` — своё имя.
-`-p 127.0.0.1:8088:8080` — **публикация порта**: порт 8088 у тебя ведёт
-в порт 8080 контейнера.
+`-d`, `--name` и `-e` ты знаешь по статье 3а; `\` в конце строки —
+команда продолжается на следующей. `-p 127.0.0.1:8088:8080` —
+**публикация порта**: порт 8088 у тебя ведёт в порт 8080 контейнера.
+`--rm` нет нарочно — зачем, увидишь через минуту.
 
 ```bash
 docker ps
 ```
 
+`docker ps` — запущенные контейнеры. Сразу после запуска `game-day-try`
+в списке есть, а через несколько секунд — нет. `docker ps -a` показывает все, вместе
+с остановленными: у `game-day-try` в столбце `STATUS` — `Exited (1)`,
+приложение завершилось с ошибкой. Почему — в его логе:
+
 ```bash
 docker logs game-day-try
 ```
 
-`docker ps` — запущенные контейнеры. `docker logs` — **лог** приложения,
-не журнал игрового дня. В логе — `атакующих 2`: профиль `stand` не включён.
+`docker logs` — **лог** приложения, не журнал игрового дня. В нём
+длинный стек ошибок, а среди них —
+`Connection to 127.0.0.1:5432 refused`: подключение отклонено.
+
+База работает, у `java -jar` этот адрес работал — а контейнер базу
+не нашёл. У контейнера своя сеть (часть 1), и `127.0.0.1` в нём — сам
+контейнер. База слушает порт 5432 твоей машины, а в контейнере на 5432
+никого нет.
+
+Убери контейнер:
 
 ```bash
-curl -fsS http://127.0.0.1:8088/actuator/health
+docker rm game-day-try
 ```
 
-```bash
-docker stop game-day-try
-```
-
-`curl` ответит `"status":"UP"` (флаги — в части 4); `docker stop`
-остановит контейнер, `--rm` его удалит.
+С `--rm` он удалился бы сам — сразу после падения, вместе с логом,
+и смотреть было бы нечего.
 
 ⚠️ Сборка падает на `./mvnw: not found` — у `mvnw` концы строк Windows
 (CRLF), переключи в IDE на `LF`. `Permission denied` — пропал **бит
 исполнения**, право запускать файл как программу: `chmod +x mvnw`,
 а в git `mvnw` уже есть — `git update-index --chmod=+x mvnw`.
 
-Столько флагов на один контейнер, а у стенда рабочего сервиса
-контейнеров несколько. Описать это файлом — работа compose.
+Свести два контейнера руками можно: своя сеть, имена, порядок запуска —
+и флагов станет вдвое больше. Стенд из нескольких программ описывают
+файлом — это работа compose.
 
 ---
 
@@ -317,31 +385,54 @@ docker stop game-day-try
 
 ### compose.yaml песочницы
 
-Файл лежит в корне песочницы, рядом с `Dockerfile`:
+Файл лежит в корне песочницы, рядом с `Dockerfile`. Служб две: база
+и приложение.
 
 ```yaml
 name: game-day                                    # имя проекта: приставка к именам контейнеров, сети, томов
 
 services:
-  game-day:                                       # служба; её имя — адрес внутри сети
+  db:                                             # служба базы; её имя — адрес внутри сети
+    image: postgres:17-alpine                     # тот же образ, что в статье 3а
+    environment:
+      POSTGRES_PASSWORD: ${GAME_DAY_DB_PASSWORD}  # пароль базы — из .env
+    volumes:
+      - db-data:/var/lib/postgresql/data          # данные базы — в томе db-data
+    healthcheck:                                  # проверка здоровья: принимает ли база подключения
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  game-day:                                       # служба приложения
     build: .                                      # собрать образ по Dockerfile из этой папки
     image: game-day:local                         # …и назвать его так
     environment:                                  # переменные окружения внутри контейнера
       SPRING_PROFILES_ACTIVE: stand               # профиль stand из статьи 2
       GAME_DAY_STOP_WORD: ${GAME_DAY_STOP_WORD}   # значение подставит Compose из .env
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres   # база — по имени службы
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${GAME_DAY_DB_PASSWORD}
     ports:
       - "127.0.0.1:8088:8080"                     # у тебя 8088 → в контейнере 8080
-    healthcheck:                                  # проверка здоровья
+    depends_on:
+      db: { condition: service_healthy }          # стартовать, когда база здорова
+    healthcheck:                                  # проверка здоровья: отвечает ли health
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/actuator/health"]
       interval: 5s
       timeout: 3s
       retries: 3
       start_period: 30s
+
+volumes:                                          # тома проекта
+  db-data:
 ```
 
 Без `name` Compose взял бы имя папки; зачем явное имя — в разделе
-о томах. С профилем `stand` (статья 2) атакующих четверо, стоп-слово —
-из `GAME_DAY_STOP_WORD`.
+о томах. Служба `db` — тот же Postgres, что ты поднимал `docker run`
+в статье 3а: образ и пароль переменной `POSTGRES_PASSWORD`. Служба
+`game-day` — образ из части 2 с профилем `stand` (статья 2): атакующих
+четверо, стоп-слово — из `GAME_DAY_STOP_WORD`. Дальше — по разделам.
 
 ### Порты — только на 127.0.0.1
 
@@ -356,28 +447,34 @@ services:
 даже если фаервол (UFW) его закрыл. Поэтому в рабочем проекте у каждого
 порта стенда `127.0.0.1:` — и это тоже сторожит тест.
 
+Порт базы мы не публикуем вовсе. Приложение ходит к ней внутри сети
+compose (следующий раздел), а `psql` есть в самом контейнере базы —
+до него дотянется `docker compose exec` (ниже). Понадобится база в окне
+IDE — открой порт так же, на `127.0.0.1`, а слева возьми другой номер,
+чтобы не спорить с базой из статьи 3а: `"127.0.0.1:5433:5432"`.
+
 ### Сеть: внутри — имя службы
 
-Compose заводит проекту свою сеть со всеми службами. Внутри неё служба
-доступна **по имени и внутреннему порту**: `game-day:8080`. Порт 8088
-есть только снаружи, а `127.0.0.1` внутри контейнера — это сам
-контейнер. Поэтому проверка здоровья, которая идёт изнутри, спрашивает
-`127.0.0.1:8080`. Увидишь это сам в конце части.
+Compose заводит проекту свою сеть со всеми службами — `game-day_default`.
+Внутри неё служба доступна **по имени и внутреннему порту**: база —
+`db:5432`, приложение — `game-day:8080`.
 
-На стенде с базой это главная ловушка: адрес базы для приложения —
-`db:5432`, имя службы и внутренний порт, а не `127.0.0.1:5432`.
-С `127.0.0.1` приложение ищет базу у себя в контейнере и не находит.
+Отсюда адрес базы в `SPRING_DATASOURCE_URL`: строка та же, что в статье
+3а, только вместо `127.0.0.1` — имя службы, `db`. Это и чинит падение
+из части 2: там приложение искало базу у себя в контейнере.
+
+Порт 8088 есть только снаружи, а `127.0.0.1` внутри контейнера — это сам
+контейнер. Поэтому проверка здоровья, которая идёт изнутри, спрашивает
+`127.0.0.1:8080`. Увидишь это сам ниже, когда поднимешь стенд.
 
 ### Тома
 
 Данные базы не должны пропадать вместе с контейнером. **Том** (volume) —
 хранилище данных вне контейнера, которым управляет Docker; его
-подключают к папке внутри, и данные переживают пересоздание. Песочнице
-том не нужен — она ничего не хранит, — поэтому пример со службой базы:
+подключают к папке внутри, и данные переживают пересоздание контейнера.
+У базы стенда так:
 
 ```yaml
-services:
-  db:
     volumes:
       - db-data:/var/lib/postgresql/data   # подключить том к папке данных Postgres
 volumes:                                   # в конце файла, на одном уровне с services
@@ -385,15 +482,17 @@ volumes:                                   # в конце файла, на од
 ```
 
 Служба только подключает том, а заводит его раздел `volumes:` в конце
-файла — без него Compose файл не примет. К имени тома Compose приставит
-имя проекта: в проекте `game-day` выйдет `game-day_db-data`. Два
-проекта с одним именем делят тома: снёс один — потерял данные другого.
-Отсюда и явный `name`.
+файла — без него Compose файл не примет:
+`service "db" refers to undefined volume db-data`. К имени тома Compose
+приставит имя проекта: выйдет `game-day_db-data`. Два проекта с одним
+именем делят тома: снёс один — потерял данные другого. Отсюда и явный
+`name`.
 
-Слева в `volumes:` бывает и путь: `./stubs:/home/wiremock:ro`.
-Это не том, а папка твоей машины, видная внутри контейнера: файлы одни
-и те же. Путь считается от папки `compose.yaml`, `:ro` — контейнер
-только читает. `down -v` такие папки не трогает.
+Бывает и так: слева в `volumes:` не том, а путь —
+`./stubs:/home/wiremock:ro`. Это папка твоей машины, видная внутри
+контейнера: файлы одни и те же. Так двойнику соседнего сервиса отдают
+записанные ответы. Путь считается от папки `compose.yaml`, `:ro` —
+контейнер только читает. `down -v` такие папки не трогает.
 
 `docker compose down` удаляет контейнеры и сеть, тома оставляет.
 🔴 `down -v` удаляет и тома — это «стереть данные стенда». И никаких
@@ -405,18 +504,24 @@ volumes:                                   # в конце файла, на од
 
 ### .env: пароли — не в файле
 
-В `compose.yaml` стоит `${GAME_DAY_STOP_WORD}`, а не само стоп-слово.
-Значение Compose **подставит** из файла `.env` рядом с `compose.yaml`.
-В репозитории лежит образец `.env.example` с явно фальшивым значением:
+В `compose.yaml` стоят `${GAME_DAY_STOP_WORD}` и
+`${GAME_DAY_DB_PASSWORD}`, а не сами значения. Значения Compose
+**подставит** из файла `.env` рядом с `compose.yaml`. В репозитории
+лежит образец `.env.example` с явно фальшивыми значениями:
 
 ```
-# Скопируй в .env и поставь своё стоп-слово; .env в git не попадает.
+# Скопируй в .env и поставь свои значения; .env в git не попадает.
 GAME_DAY_STOP_WORD=change-me-local
+GAME_DAY_DB_PASSWORD=change-me-db-local
 ```
 
 Каждый копирует его (`cp .env.example .env`) и ставит своё. `.env`
 в git не идёт — добавь его в `.gitignore` песочницы (в рабочем проекте
 так уже есть).
+
+Пароль базы нужен двоим: базе — как `POSTGRES_PASSWORD`, приложению —
+как `SPRING_DATASOURCE_PASSWORD`. Одна переменная на обоих — и пароли
+не разойдутся.
 
 🔴 Пароль, попавший в коммит, остаётся в истории git: коммит «убрал
 пароль» его оттуда не достаёт. Такой пароль считают утёкшим и меняют.
@@ -436,11 +541,6 @@ GAME_DAY_STOP_WORD=change-me-local
 а секретами. На боевых серверах так и делают; на локальном стенде
 пароли фальшивые.
 
-💡 На стенде с базой том помнит первый запуск: Postgres берёт пароль
-из `.env`, только когда том пуст, дальше пароль живёт в томе. Поменял
-его в `.env` — получишь `password authentication failed`, пока
-не снесёшь том (`down -v`).
-
 ### Проверка здоровья
 
 «Контейнер запущен» — ещё не «приложение готово». **Проверка здоровья**
@@ -449,10 +549,13 @@ GAME_DAY_STOP_WORD=change-me-local
 `healthy`, после нескольких неудач подряд `unhealthy` — видно
 в `docker compose ps`.
 
+У приложения:
+
 * `test` — команда списком: `CMD` — «запустить без оболочки»,
-  `CMD-SHELL` — строкой через оболочку (так часто пишут проверку базы). `wget -qO-`
-  спрашивает `/actuator/health`: `-q` — молча, `-O-` — ответ в вывод,
-  а не в файл. На `503` `wget` выйдет с ошибкой;
+  `CMD-SHELL` — строкой через оболочку. `wget -qO-` спрашивает
+  `/actuator/health` — тот самый адрес, который охрана пускает без входа
+  (часть 2): пароля у Docker нет. `-q` — молча, `-O-` — ответ в вывод,
+  а не в файл. На `503` и `401` `wget` выйдет с ошибкой;
 * `wget`, а не `curl`: `curl` в образе нет, а `wget` из основы alpine
   есть;
 * `interval` — как часто (без него — раз в 30 секунд), `timeout` —
@@ -461,21 +564,29 @@ GAME_DAY_STOP_WORD=change-me-local
 * `start_period` — время на старт: провалы в нём не считаются, а первая
   удача сразу даёт `healthy`.
 
+У базы — `pg_isready`, программа из образа Postgres: «принимает ли база
+подключения». `-U postgres` — от чьего имени спрашивать. `-h 127.0.0.1` —
+стучаться по сети, как будет стучаться приложение. Без `-h` `pg_isready`
+спрашивает базу в обход сети, а при первом запуске Postgres ненадолго
+поднимается именно так, без сети, — чтобы создать базу. Проверка сказала
+бы «готов» раньше, чем база откроет порт.
+
 ### depends_on: ждать не запуска, а здоровья
 
-По здоровью службы ждут друг друга. На стенде с базой приложение
-стартует после неё, иначе Flyway упадёт на первом подключении:
+Приложение без базы не поднимается (часть 2), поэтому служба `game-day`
+ждёт `db`:
 
 ```yaml
     depends_on:
-      db:    { condition: service_healthy }   # ждать, пока база здорова
-      stubs: { condition: service_started }   # у двойника проверки нет — ждать запуска
+      db: { condition: service_healthy }   # ждать, пока база здорова
 ```
 
 Фигурные скобки — та же вложенность YAML в одну строку: то же, что
-`condition:` строкой ниже с отступом. `service_started` — ждать запуска
-контейнера, `service_healthy` — пока проверка не скажет `healthy`.
-У песочницы служба одна, и `depends_on` ей не нужен.
+`condition:` строкой ниже с отступом. `service_healthy` — ждать, пока
+проверка не скажет `healthy`. Без `depends_on` Compose запустит обе
+службы разом, и успеет ли база проснуться раньше Flyway — вопрос удачи.
+Бывает и `service_started` — ждать только запуска контейнера: так ждут
+службу без проверки здоровья, например двойника.
 
 Живость и готовность — тема глубже, чем «есть адрес здоровья»;
 в рабочем проекте её решает мидл.
@@ -501,8 +612,24 @@ docker compose logs game-day
 ```
 
 `up -d --build` — пересобрать образ и поднять в фоне; `compose.yaml`
-и `.env` Compose нашёл в текущей папке. В `ps` через несколько секунд —
-`(healthy)`, в логе — `атакующих 4`. Теперь сеть изнутри:
+и `.env` Compose нашёл в текущей папке. Первой поднимается база,
+приложение — когда она станет `healthy`. Немного погодя в `ps` у обеих
+служб — `(healthy)`. В логе приложения — `атакующих 4` и строка Flyway
+`Successfully applied 1 migration`: база новая.
+
+Охрана на стенде та же, что в статье 5:
+
+```bash
+curl -i http://127.0.0.1:8088/game-day/incidents
+```
+
+```bash
+curl -u admin:admin-local http://127.0.0.1:8088/game-day/incidents
+```
+
+Без входа — `401`. Под `admin` — страница журнала: одно происшествие,
+«Брокер не отвечает», — его записал запуск приложения, — и `"total":1`.
+Теперь сеть изнутри:
 
 ```bash
 docker compose exec -T game-day wget -qO- http://game-day:8080/actuator/health
@@ -519,10 +646,58 @@ docker compose exec -T game-day wget -qO- http://game-day:8080/actuator/health
 docker compose down
 ```
 
-`down` останавливает и удаляет контейнер и сеть. Лежит `compose.yaml`
-не в текущей папке — путь к нему дают флагом `-f`, а к `.env` —
-флагом `--env-file`. Так сделает скрипт в части 4: его можно запускать
-из любой папки.
+`down` останавливает и удаляет контейнеры и сеть, том оставляет.
+Приложение закрывается за секунды: `SIGTERM` дошёл до Java, потому что
+`ENTRYPOINT` записан списком (часть 2). Лежит `compose.yaml` не в текущей
+папке — путь к нему дают флагом `-f`, а к `.env` — флагом `--env-file`.
+Так сделает скрипт в части 4: его можно запускать из любой папки.
+
+### Том помнит
+
+Подними стенд снова:
+
+```bash
+docker compose up -d
+```
+
+Дождись `(healthy)` в `docker compose ps` и посчитай происшествия прямо
+в базе — `psql` внутри контейнера службы `db`:
+
+```bash
+docker compose exec -T db psql -U postgres -c "SELECT count(*) FROM game_day.incident"
+```
+
+`-c` — выполнить одну команду и выйти (статья 4). Ответ:
+
+```
+ count
+-------
+     2
+(1 row)
+```
+
+Два «Брокера»: с прошлого подъёма и с этого. Контейнер базы `down`
+удалил, а том `game-day_db-data` остался — его видно
+в `docker volume ls`, — и новый контейнер взял данные из него. Flyway
+в логе приложения на этот раз пишет
+`Schema "game_day" is up to date. No migration necessary.`: эту базу
+он уже видел.
+
+```bash
+docker compose down -v
+```
+
+Снова `up -d` — и `count` равен `1`, а Flyway опять применяет миграцию:
+том создан заново, база пустая.
+
+⚠️ Том помнит и пароль. Postgres берёт `POSTGRES_PASSWORD`, только когда
+том пуст, — при первом запуске; дальше пароль живёт в томе. Поменяй
+`GAME_DAY_DB_PASSWORD` в `.env` и снова `docker compose up -d`:
+приложение получит новый пароль, а база помнит старый. В
+`docker compose logs game-day` —
+`password authentication failed for user "postgres"`. Выхода два:
+вернуть в `.env` прежний пароль — или снести том, `down -v`, если
+данных не жалко.
 
 ---
 
@@ -531,7 +706,7 @@ docker compose down
 ### Зачем скрипт
 
 Поднять стенд — это проверить `.env`, собрать, поднять, дождаться
-здоровья и спросить приложение снаружи.
+здоровья обеих служб и спросить приложение снаружи.
 
 **bash** — оболочка, как `/bin/sh` из части 2, только удобнее; есть
 в Git Bash, на Linux и macOS. **Скрипт** — файл с командами, которые
@@ -598,8 +773,14 @@ docker compose -f "$SANDBOX_DIR/compose.yaml" --env-file "$ENV_FILE" up -d --bui
 запустил скрипт, узнает, что не вышло. `>&2` — печатать в поток
 ошибок, отдельный канал для таких сообщений; в консоли видны оба.
 
-`--wait` велит Compose ждать здоровья службы, а через `--wait-timeout`
-секунд без него — вернуть ошибку.
+`--wait` велит Compose ждать здоровья всех служб — и базы,
+и приложения, — а через `--wait-timeout` секунд без него — вернуть
+ошибку. Служба заболела раньше — Compose не ждёт до конца и называет
+контейнер. Убери из `SecurityConfig` правило для health (часть 2)
+и запусти скрипт: после `start_period` и трёх провалов подряд он упадёт
+со словами `container game-day-game-day-1 is unhealthy`. Приложение
+при этом работает — просто Docker спрашивает здоровье без пароля
+и получает `401`. Посмотрел — верни правило на место.
 
 ### game-alive.sh
 
@@ -637,11 +818,22 @@ fi
 $ stand/game-alive.sh                       # стенд поднят — код выхода 0
 {"groups":["liveness","readiness"],"status":"UP"}
 игра жива
+```
 
-$ stand/game-alive.sh                       # приложение больно — код 1
+Теперь сделай приложению больно: останови базу — `docker compose stop db` —
+и спроси снова.
+
+```
+$ stand/game-alive.sh                       # база остановлена — код 1
 curl: (22) The requested URL returned error: 503
 игра не отвечает на http://127.0.0.1:8088/actuator/health — смотри из папки песочницы: docker compose logs game-day
 ```
+
+Ответ придёт не сразу: health спрашивает и базу, а приложение сперва
+ждёт подключения к ней. Не дождалось — `DOWN`, `503`, а `-f` превратил
+его в код `22`. Верни базу — `docker compose start db` — и подожди:
+приложение переподключится само, без перезапуска, и скрипт снова скажет
+«игра жива».
 
 Стенд не поднят — вместо `(22)` будет `curl: (7) Failed to connect…`:
 код `7` — «не подключился», `22` — «подключился, но ответ — ошибка».
@@ -682,13 +874,18 @@ bash -n stand/game-up.sh
 2. Почему в Dockerfile `pom.xml` копируют раньше `src/`?
 3. Зачем образу две ступени и почему во второй JRE, а не JDK?
 4. Что случится при `docker stop`, если `ENTRYPOINT` записан строкой?
-5. Чем опасен порт `"8088:8080"` без адреса и почему не стоит надеяться
+5. Почему `/actuator/health` открыт без входа, а `/actuator/health/liveness`
+   и остальной Actuator — нет? Что будет со стендом, если правило
+   для health забыть?
+6. Чем опасен порт `"8088:8080"` без адреса и почему не стоит надеяться
    на фаервол?
-6. Приложение в контейнере ходит в базу по `127.0.0.1:5432` и не может
-   подключиться. Почему и как правильно?
-7. В `.env` одно стоп-слово, а приложение получило другое — или не видит
-   переменную вовсе. Что могло случиться?
-8. Что делает каждая часть `set -euo pipefail` и зачем `curl` флаги
+7. Контейнер из части 2 получил адрес базы `127.0.0.1:5432` — тот самый,
+   с которым работал `java -jar`, — и упал. Почему, и какой адрес
+   правильный на стенде compose?
+8. В `.env` одно стоп-слово, а приложение получило другое — или не видит
+   переменную вовсе. Что могло случиться? А если после смены пароля базы
+   в `.env` приложение перестало входить в базу?
+9. Что делает каждая часть `set -euo pipefail` и зачем `curl` флаги
    `-fsS`?
 
 ---
@@ -709,6 +906,11 @@ bash -n stand/game-up.sh
   `ports`, `volumes`, `healthcheck`, `depends_on`;
 * [Compose: Variable interpolation](https://docs.docker.com/compose/how-tos/environment-variables/variable-interpolation/) —
   `.env`, `--env-file`, кто кого сильнее;
+* [Docker Official Image: postgres](https://hub.docker.com/_/postgres) —
+  `POSTGRES_PASSWORD` и предупреждение: переменные образа действуют
+  только на пустой папке данных;
+* [Spring Boot: Actuator Endpoints](https://docs.spring.io/spring-boot/reference/actuator/endpoints.html) —
+  что открыто по вебу, проверка `db` в health, `DOWN` → `503`;
 * [GNU Bash: The Set Builtin](https://www.gnu.org/software/bash/manual/html_node/The-Set-Builtin.html) —
   `-e` и где он молчит, `-u`, `pipefail`, `-n`.
 
@@ -716,11 +918,11 @@ bash -n stand/game-up.sh
 
 ## Пример целиком
 
-Учебный пример. Запускай в песочнице `game-day` из статей 1–2.
+Учебный пример. Запускай в песочнице `game-day` после статьи 5.
+Java-код, тесты, `application.yml`, `application-stand.yml` и миграция —
+из статей 1–5 без изменений, кроме `SecurityConfig`: он ниже целиком.
 Нужны запущенный Docker Desktop и Git Bash (на Linux и macOS — обычная
-консоль); JDK для стенда не нужен — приложение собирается внутри
-образа. Java-код песочницы, `application.yml` и `application-stand.yml` —
-из статьи 2 без изменений.
+консоль); JDK для стенда не нужен — приложение собирается внутри образа.
 
 ```
 game-day/
@@ -732,26 +934,65 @@ game-day/
 ├── Dockerfile
 ├── compose.yaml
 ├── mvnw, .mvn/        ← от Initializr
-├── pom.xml            ← + webmvc и actuator
+├── pom.xml            ← + actuator
 ├── stand/
 │   ├── game-alive.sh
 │   └── game-up.sh
-└── src/               ← из статей 1–2
+└── src/               ← из статей 1–5; в SecurityConfig — health без входа
 ```
 
 Путь к файлу — комментарием в первой строке; у скриптов первая строка —
 shebang, поэтому путь — во второй.
 
 ```xml
-<!-- pom.xml: в <dependencies>, рядом с тем, что положили Initializr и статья 2 -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-webmvc</artifactId>
-</dependency>
+<!-- pom.xml: в <dependencies>, рядом с тем, что уже есть -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-actuator</artifactId>
 </dependency>
+```
+
+```java
+// src/main/java/example/gameday/SecurityConfig.java
+package example.gameday;
+
+import jakarta.servlet.DispatcherType;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+
+/** Охрана песочницы: вход по Basic, пользователи в памяти; журнал — только admin, health — всем. */
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain security(HttpSecurity http) {
+        http.authorizeHttpRequests(access -> access
+                        .dispatcherTypeMatchers(DispatcherType.ERROR).permitAll()
+                        .requestMatchers(HttpMethod.GET, "/actuator/health").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/game-day/incidents").hasRole("admin")
+                        .requestMatchers(HttpMethod.GET, "/game-day/incidents/{id}").hasRole("admin")
+                        .anyRequest().denyAll())
+                .httpBasic(Customizer.withDefaults())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        return http.build();
+    }
+
+    @Bean
+    public UserDetailsService users() {
+        return new InMemoryUserDetailsManager(
+                User.withUsername("admin").password("{noop}admin-local").roles("admin").build(),
+                User.withUsername("viewer").password("{noop}viewer-local").roles("viewer").build());
+    }
+}
 ```
 
 ```dockerfile
@@ -790,26 +1031,47 @@ stand/
 name: game-day
 
 services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_PASSWORD: ${GAME_DAY_DB_PASSWORD}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-h", "127.0.0.1", "-U", "postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
   game-day:
     build: .
     image: game-day:local
     environment:
       SPRING_PROFILES_ACTIVE: stand
       GAME_DAY_STOP_WORD: ${GAME_DAY_STOP_WORD}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/postgres
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: ${GAME_DAY_DB_PASSWORD}
     ports:
       - "127.0.0.1:8088:8080"
+    depends_on:
+      db: { condition: service_healthy }
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/actuator/health"]
       interval: 5s
       timeout: 3s
       retries: 3
       start_period: 30s
+
+volumes:
+  db-data:
 ```
 
 ```
 # .env.example
-# Скопируй в .env и поставь своё стоп-слово; .env в git не попадает.
+# Скопируй в .env и поставь свои значения; .env в git не попадает.
 GAME_DAY_STOP_WORD=change-me-local
+GAME_DAY_DB_PASSWORD=change-me-db-local
 ```
 
 ```
@@ -858,18 +1120,35 @@ fi
 
 **Порядок проверки** — из папки песочницы, по одной команде:
 
-1. `cp .env.example .env` — и своё стоп-слово в `.env`;
-2. `chmod +x stand/*.sh`, затем `bash -n stand/game-up.sh` и
+1. `curl -i http://127.0.0.1:8080/actuator/health` у песочницы
+   из IDE или `java -jar`: до правила в `SecurityConfig` — `401`, после —
+   `{"groups":["liveness","readiness"],"status":"UP"}`;
+2. `docker build -t game-day:local .`, затем `docker run` из части 2 —
+   `docker ps -a` показывает `Exited (1)`, в `docker logs game-day-try` —
+   `Connection to 127.0.0.1:5432 refused`; `docker rm game-day-try`;
+3. `cp .env.example .env` — и свои значения в `.env`;
+4. `chmod +x stand/*.sh`, затем `bash -n stand/game-up.sh` и
    `bash -n stand/game-alive.sh` — пустой вывод;
-3. `stand/game-up.sh` — строки Compose (зависят от версии), потом
+5. `stand/game-up.sh` — строки Compose (зависят от версии), потом
    ответ `health` и `игра жива`; `echo $?` — `0`;
-4. `docker compose ps` — `(healthy)`; `docker compose logs game-day` —
-   `атакующих 4`;
-5. `docker compose exec -T game-day wget -qO- http://game-day:8080/actuator/health` —
+6. `docker compose ps` — у `db` и `game-day` `(healthy)`;
+   `docker compose logs game-day` — `атакующих 4`;
+7. `curl -i http://127.0.0.1:8088/game-day/incidents` — `401`;
+   с `-u admin:admin-local` — «Брокер не отвечает» и `"total":1`;
+8. `docker compose exec -T game-day wget -qO- http://game-day:8080/actuator/health` —
    `"status":"UP"` по имени службы;
-6. `docker compose down`, затем `stand/game-alive.sh` — `curl: (7)`
-   и код `1`;
-7. без стоп-слова: `mv .env .env.off`, `docker compose up -d` —
-   предупреждение `variable is not set`; `docker compose logs game-day` —
-   `APPLICATION FAILED TO START` и `stopWord`; `docker compose down`,
-   `mv .env.off .env`.
+9. `docker compose stop db`, затем `stand/game-alive.sh` — не сразу,
+   `curl: (22)` с `503` и код `1`; `docker compose start db` — немного
+   погодя снова `игра жива`;
+10. `docker compose down`, затем `stand/game-alive.sh` — `curl: (7)`
+    и код `1`; в `docker volume ls` — `game-day_db-data`;
+11. `stand/game-up.sh`, затем
+    `docker compose exec -T db psql -U postgres -c "SELECT count(*) FROM game_day.incident"` —
+    `2`; `docker compose down -v`, снова `stand/game-up.sh` — `1`;
+12. пароль: поменяй `GAME_DAY_DB_PASSWORD` в `.env`, `docker compose up -d` —
+    в `docker compose logs game-day` `password authentication failed`;
+    верни прежний пароль и `docker compose up -d`;
+13. без стоп-слова: поставь `#` в начало строки `GAME_DAY_STOP_WORD`
+    в `.env`, `docker compose up -d` — предупреждение `variable is not set`;
+    `docker compose logs game-day` — `APPLICATION FAILED TO START`
+    и `stopWord`; убери `#` и `docker compose down`.

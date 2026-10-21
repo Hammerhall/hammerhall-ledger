@@ -671,7 +671,9 @@ Jackson 3 приехал в неё со стартером веба, JUnit и As
 не меняется. Добавь восемь классов в `src/main/java/example/gameday/events/`,
 четыре эталона в `src/test/resources/game-day/events/` и два теста
 в `src/test/java/example/gameday/events/`. Один класс — треугольником
-в IDE или `./mvnw test -Dtest=Имя`, все — `./mvnw test`.
+в IDE или `./mvnw test -Dtest=Имя`: тестам событий база не нужна.
+Все — `./mvnw test`; тесты песочницы с базой ждут запущенный Docker,
+как в статье 3а.
 
 Путь к файлу — комментарием в первой строке.
 

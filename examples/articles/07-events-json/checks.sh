@@ -262,7 +262,18 @@ expect_contains "$probe" "строгий маппер, AttackStarted: AttackStar
 show "$(probe_lines 'FAIL_ON|строгий' "$probe")"
 
 section "Бин JsonMapper от Boot: умолчание и ключ spring.jackson.*"
-BOOT_ARGS=(--spring.main.web-application-type=none --spring.main.banner-mode=off)
+# С статьи 3а песочница без базы не стартует — проба поднимает Postgres, как часть 1 статьи 3а.
+PROBE_DB=game-day-probe-db
+docker rm -f "$PROBE_DB" >/dev/null 2>&1
+docker run -d --rm --name "$PROBE_DB" -p 127.0.0.1:55432:5432 -e POSTGRES_PASSWORD=probe postgres:17-alpine >/dev/null
+for _ in $(seq 90); do
+    docker exec "$PROBE_DB" pg_isready -q -h 127.0.0.1 -U postgres && break
+    sleep 1
+done
+# Веб не выключаем: охране из статьи 5 нужен бин HttpSecurity, его Boot даёт веб-приложению.
+BOOT_ARGS=(--server.port=0 --spring.main.banner-mode=off
+    --spring.datasource.url=jdbc:postgresql://127.0.0.1:55432/postgres
+    --spring.datasource.username=postgres --spring.datasource.password=probe)
 out=$(run_probe example.gameday.events.BootMapperProbe "${BOOT_ARGS[@]}"); code=$?
 expect_ok "$code" "контекст песочницы с бином JsonMapper"
 expect_contains "$out" "бин Boot, FAIL_ON_UNKNOWN_PROPERTIES: false" "Boot 4.1 умолчание Jackson 3 не меняет"
@@ -278,6 +289,7 @@ expect_contains "$out" 'бин Boot, запись без аннотации: Unr
 expect_contains "$out" "бин Boot, AttackStarted: AttackStarted[at=2026-10-14T10:00:00Z, target=feed]" \
     "с аннотацией — разбирается"
 show "$(probe_lines 'бин Boot' "$out")"
+docker rm -f "$PROBE_DB" >/dev/null 2>&1
 
 section "Дерево: get, path, «приведи как сможешь»"
 expect_contains "$probe" 'get("at") без поля: null' "get без поля — null"
