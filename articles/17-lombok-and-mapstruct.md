@@ -365,7 +365,7 @@ IDEA понимает Lombok через плагин; в свежих верси
 ```java
 // учебная CRM клуба: сущность лида — сокращено
 @Entity
-@Table(name = "lead")
+@Table(name = "lead", schema = "sales")
 @Getter
 @Setter
 @Builder
