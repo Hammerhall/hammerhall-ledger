@@ -384,7 +384,7 @@ IO.println("крупные заказы дали " + bigShare + "% выручк�
 на странах мира. Задачи бесплатны, нужен только вход:
 
 * [«Региональные саммиты»](https://hammerhall.io/forge/stream-forge/task/WldCode0038);
-* [«Найти среднее население городов по каждому континенту»](https://hammerhall.io/forge/stream-forge/task/WldCode0044);
+* [«Заметки урбаниста»](https://hammerhall.io/forge/stream-forge/task/WldCode0044);
 * [«Открытки туриста»](https://hammerhall.io/forge/stream-forge/task/WldCode0053).
 
 ## Что дальше

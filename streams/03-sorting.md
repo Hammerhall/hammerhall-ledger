@@ -460,7 +460,7 @@ Hammerhall, на фильмах и странах мира. Первые зад�
 
 * [«Флаги вдоль набережной»](https://hammerhall.io/forge/stream-forge/task/WldCode0003);
 * [«Пыльные коробки архива»](https://hammerhall.io/forge/stream-forge/task/MovCode0009);
-* [«Найти самый ранний фильм в базе»](https://hammerhall.io/forge/stream-forge/task/MovCode0011);
+* [«Экскурсия в киномузей»](https://hammerhall.io/forge/stream-forge/task/MovCode0011);
 * [«Стенд в школьном коридоре»](https://hammerhall.io/forge/stream-forge/task/WldCode0013);
 * [«Спор у глобуса»](https://hammerhall.io/forge/stream-forge/task/WldCode0006).
 

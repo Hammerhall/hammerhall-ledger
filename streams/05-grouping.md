@@ -429,10 +429,10 @@ groupingBy:     {false=10}
 в кузнице Stream Forge на платформе Hammerhall, на фильмах и странах
 мира. Задачи бесплатны, нужен только вход:
 
-* [«Сгруппировать фильмы по количеству жанров»](https://hammerhall.io/forge/stream-forge/task/MovCode0016);
-* [«Сгруппировать фильмы по десятилетиям»](https://hammerhall.io/forge/stream-forge/task/MovCode0021);
-* [«Посчитать количество фильмов для каждого года»](https://hammerhall.io/forge/stream-forge/task/MovCode0023);
-* [«Построить индекс стран по коду»](https://hammerhall.io/forge/stream-forge/task/WldCode0008).
+* [«Ящики прокатной конторы»](https://hammerhall.io/forge/stream-forge/task/MovCode0016);
+* [«Анфилада залов»](https://hammerhall.io/forge/stream-forge/task/MovCode0021);
+* [«Летопись студии»](https://hammerhall.io/forge/stream-forge/task/MovCode0023);
+* [«Багажные бирки»](https://hammerhall.io/forge/stream-forge/task/WldCode0008).
 
 ## Что дальше
 

@@ -386,8 +386,8 @@ Stream Forge на платформе Hammerhall, на фильмах и стра
 задачи бесплатны, нужен только вход:
 
 * [«Справочник почтальона»](https://hammerhall.io/forge/stream-forge/task/WldCode0005);
-* [«Получить список названий столиц всех стран»](https://hammerhall.io/forge/stream-forge/task/WldCode0014);
-* [«Получить список всех режиссёров фильмов без создания промежуточных коллекций»](https://hammerhall.io/forge/stream-forge/task/MovCode0019);
+* [«Свиток дипломата»](https://hammerhall.io/forge/stream-forge/task/WldCode0014);
+* [«Пригласительные на фестиваль»](https://hammerhall.io/forge/stream-forge/task/MovCode0019);
 * [«Атлас для первоклассника»](https://hammerhall.io/forge/stream-forge/task/WldCode0002).
 
 ## Что дальше

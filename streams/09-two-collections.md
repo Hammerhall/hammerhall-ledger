@@ -380,7 +380,7 @@ List<String> noCard = orders.stream()
 Задачи на две коллекции — страны и их города — в кузнице Stream Forge
 на платформе Hammerhall. Первые задачи бесплатны, нужен только вход:
 
-* [«Найти столицу с наибольшей численностью населения»](https://hammerhall.io/forge/stream-forge/task/WldCode0015);
+* [«Час пик»](https://hammerhall.io/forge/stream-forge/task/WldCode0015);
 * [«Конверты в посольства»](https://hammerhall.io/forge/stream-forge/task/WldCode0026);
 * [«Жалоба губернатора»](https://hammerhall.io/forge/stream-forge/task/WldMind0020);
 * [«Спор двух городов»](https://hammerhall.io/forge/stream-forge/task/WldMind0021).

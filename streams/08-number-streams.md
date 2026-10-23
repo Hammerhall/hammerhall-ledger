@@ -431,8 +431,8 @@ Exception in thread "main" java.lang.ArithmeticException: integer overflow
 на платформе Hammerhall, на странах и городах мира. Первые задачи
 бесплатны, нужен только вход:
 
-* [«Вычислить суммарную численность населения всех городов мира»](https://hammerhall.io/forge/stream-forge/task/WldCode0009);
-* [«Найти минимальное, максимальное и среднее население стран мира»](https://hammerhall.io/forge/stream-forge/task/WldCode0021);
+* [«Ночные огни планеты»](https://hammerhall.io/forge/stream-forge/task/WldCode0009);
+* [«Отчёт для министра»](https://hammerhall.io/forge/stream-forge/task/WldCode0021);
 * [«Ошибка переписчика»](https://hammerhall.io/forge/stream-forge/task/WldMind0019).
 
 ## Что дальше

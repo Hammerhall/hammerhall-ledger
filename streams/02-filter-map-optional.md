@@ -579,8 +579,8 @@ orElseGet: Егор
 * [«Витрина видеосалона»](https://hammerhall.io/forge/stream-forge/task/MovCode0003);
 * [«Долгожданная премьера»](https://hammerhall.io/forge/stream-forge/task/MovCode0005);
 * [«Ни рыба ни мясо»](https://hammerhall.io/forge/stream-forge/task/MovCode0007);
-* [«Найти все фильмы заданного жанра»](https://hammerhall.io/forge/stream-forge/task/MovCode0014);
-* [«Проверить, есть ли в базе хотя бы один фильм указанного жанра»](https://hammerhall.io/forge/stream-forge/task/MovCode0013).
+* [«Тематическая неделя»](https://hammerhall.io/forge/stream-forge/task/MovCode0014);
+* [«Вопрос у билетной кассы»](https://hammerhall.io/forge/stream-forge/task/MovCode0013).
 
 ## Что дальше
 
