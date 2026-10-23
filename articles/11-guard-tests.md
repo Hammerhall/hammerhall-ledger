@@ -579,6 +579,11 @@ void findsPlantedViolator(@TempDir Path dir) throws IOException {
 Следующая серия, «От системы к делу», учит читать живую систему: какое
 правило дела записано в коде и что сломалось бы, будь оно записано иначе.
 
+А о самих тестах — как читать красную сборку, какие случаи брать и как
+понять, что тест вообще что-то проверяет, — есть отдельная серия
+«От красного к зелёному». Начни со [статьи 1 «Зачем тесты и чего
+от тебя ждут на проекте»](https://hammerhall.io/ledger/testing/1-why-tests).
+
 ## Первоисточники
 
 * [Java SE 25: Files](https://docs.oracle.com/en/java/javase/25/docs/api/java.base/java/nio/file/Files.html) —
