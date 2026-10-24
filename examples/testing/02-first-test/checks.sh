@@ -224,13 +224,16 @@ if expect_changed "$v/$SCORE" "$SCORE" "FULL = 10"; then
     show "$(summary_lines "$out")"
 fi
 
-section "Тест из интернета на JUnit 4 не компилируется: package org.junit does not exist"
+section "Тест из интернета на JUnit 4 не компилируется: cannot find symbol — класса Test в org.junit нет"
 v=$(make_variant junit4-import)
 put_class "$v" OldStyleTest "$JUNIT4_CLASS"
 out=$(cd "$v" && mvn -B -ntp test 2>&1); code=$?
 expect_failed "$code" "mvn test с import org.junit.Test"
-expect_contains "$out" "package org.junit does not exist" "package org.junit does not exist"
-show "$(grep -m 1 'package org.junit does not exist' <<<"$out")"
+expect_contains "$out" "cannot find symbol" "cannot find symbol — как в статье"
+expect_contains "$out" "symbol:   class Test" "…символ — класс Test"
+expect_contains "$out" "location: package org.junit" "…в пакете org.junit: пакет компилятор находит"
+expect_not_contains "$out" "package org.junit does not exist" "«package org.junit does not exist» нет — JUnit 6 лежит в org.junit.jupiter"
+show "$(grep -m 3 -E 'cannot find symbol|symbol: +class Test|location: package org.junit' <<<"$out")"
 
 section "assertThat из Hamcrest: строка AssertJ не компилируется"
 v=$(make_variant hamcrest)

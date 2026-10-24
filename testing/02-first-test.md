@@ -123,7 +123,9 @@ class DeadlineScoreTest {
 JUnit 4, и в нём `public` был обязателен. В песочнице JUnit 6, а пишется
 он как пятый: аннотации из `org.junit.jupiter.api`, без `public`,
 проверки на AssertJ. Четвёртого JUnit в песочнице нет, и такой тест
-не скомпилируется: `package org.junit does not exist`.
+не скомпилируется: на `import org.junit.Test` компилятор ответит
+`cannot find symbol`. Пакет `org.junit` он найдёт: внутри лежит JUnit 6,
+`org.junit.jupiter`. А класса `Test` там нет.
 
 Хуже, если JUnit 4 приедет в проект вместе с чужой библиотекой. Тогда
 тест скомпилируется, но сборка, скорее всего, его не запустит, а IDE —
