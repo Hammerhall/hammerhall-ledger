@@ -1,18 +1,18 @@
 # Статья 17 «Lombok и MapStruct: код, который пишут за тебя» — утверждения статьи, которые проверяет прогон.
 # Запускает tools/run_examples.sh из папки собранного примера; функции — tools/checks_lib.sh.
 #
-# Песочница — после статьи 16: журнал в example.gameday.journal (18 файлов, 2 миграции), сторожа GameDayRulesTest
-# (43 запуска), модель статей 12–16 в example.crm и её тесты. Код статьи — чистая Java, без Lombok: LeadCard
+# Песочница — после статьи 16а: журнал в example.gameday.journal (18 файлов, 2 миграции), сторожа GameDayRulesTest
+# (43 запуска), модель статей 12–16а в example.crm и её тесты. Код статьи — чистая Java, без Lombok: LeadCard
 # и LeadCardView в src/main/java/example/crm, LeadCardTest в src/test/java/example/crm; pom.xml песочницы
 # не меняется. В mvn verify он уже прошёл. Здесь — то, что статья обещает словами: 4 запуска теста и прежние числа
-# у тестов 12–16 и сторожа; короткие куски в тексте — те же, что в «Пример целиком»; javap на своей карточке; что
+# у тестов 12–16а и сторожа; короткие куски в тексте — те же, что в «Пример целиком»; javap на своей карточке; что
 # печатают и как сравниваются LeadCard и LeadCardView; кусок про OffsetDateTime как есть; «что будет, если» —
 # мутации своего кода. Обещания о самих Lombok и MapStruct проверяются настоящими обработчиками в отдельной папке,
 # мимо песочницы: карточка на Lombok из части 2 даёт тот же .class и проходит тот же тест, без пути к обработчику
 # на JDK 23+ сборка падает, без @AllArgsConstructor — тоже, @Data меняет равенство и печать; маппер, ответ и pom
 # из части 3 — реализация, как в наброске статьи, @Component от ключа -A, молчание и предупреждение о полях;
 # @RequiredArgsConstructor и @Slf4j — по javap. Мутации и тесты гоняются ConsoleLauncher JUnit той же версии,
-# что в BOM Boot, — как в 12–16.
+# что в BOM Boot, — как в 12–16а.
 
 CLS=example.crm.LeadCardTest
 CRM=src/main/java/example/crm
@@ -150,6 +150,7 @@ suite_ok example.crm.CheckoutTest 11
 suite_ok example.crm.RublesTest 5
 suite_ok example.crm.FunnelNumbersTest 13
 suite_ok example.crm.TodayListTest 3
+suite_ok example.crm.ClubClientTest 21
 suite_ok example.gameday.journal.GameDayRulesTest 43
 note "у сторожа статьи 11 по-прежнему 43 запуска: в папку журнала новые классы не попали, миграций не прибавилось"
 for cls in IncidentLogTest IncidentMetricsTest IncidentTest IncidentLogIT; do

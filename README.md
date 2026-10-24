@@ -58,18 +58,69 @@ Java Stream API от первого `filter` до своего коллекто�
 
 Как пишут код команды Hammerhall: буткемп работает в открытых
 репозиториях, лаборатория — в закрытых. Серии «От … к …» — то, что
-нужно новичку до первой задачи. Пример — учебный проект «Игровой день».
+нужно новичку до первой задачи. Статьи идут по порядку, и пример у них
+один, растущий от статьи к статье: учебный проект «Игровой день»,
+со статьи 12 — учебная CRM спортивного клуба. У серии о тестах свой
+пример — «зачёт по сроку».
 
 ## От Java к Spring Boot
 
-Что нужно знать до Spring, зачем он вообще нужен и как устроен
-Spring Boot 4.
+Что нужно знать до Spring, зачем он вообще нужен, как устроен
+Spring Boot 4, как приложение хранит данные и отвечает по HTTP.
 
 | № | Статья | Текст | Код |
 |---|---|---|---|
 | 0 | [Что нужно знать до Spring](https://hammerhall.io/ledger/articles/0-before-spring) | [md](articles/00-before-spring.md) | [пример](examples/articles/00-before-spring) |
 | 1 | [Зачем Spring](https://hammerhall.io/ledger/articles/1-why-spring) | [md](articles/01-why-spring.md) | [пример](examples/articles/01-why-spring) |
 | 2 | [Spring Boot 4 для самых маленьких](https://hammerhall.io/ledger/articles/2-spring-boot-4) | [md](articles/02-spring-boot-4.md) | [пример](examples/articles/02-spring-boot-4) |
+| 3а | [Данные, часть 1: таблица и миграция](https://hammerhall.io/ledger/articles/3a-table-and-migration) | [md](articles/03a-table-and-migration.md) | [пример](examples/articles/03a-table-and-migration) |
+| 3б | [Данные, часть 2: сущность, хранилище, транзакция](https://hammerhall.io/ledger/articles/3b-entity-and-transaction) | [md](articles/03b-entity-and-transaction.md) | [пример](examples/articles/03b-entity-and-transaction) |
+| 4 | [Первая ручка: как приложение отвечает по HTTP](https://hammerhall.io/ledger/articles/4-web) | [md](articles/04-web.md) | [пример](examples/articles/04-web) |
+| 5 | [Ручка целиком: слои, доступ, страницы, тесты всех слоёв](https://hammerhall.io/ledger/articles/5-full-endpoint) | [md](articles/05-full-endpoint.md) | [пример](examples/articles/05-full-endpoint) |
+
+## От Spring к системе
+
+Следующий шаг: как приложение живёт среди других программ — стенд,
+события, метрики и тесты, которые сторожат правила проекта.
+
+| № | Статья | Текст | Код |
+|---|---|---|---|
+| 6 | [Стенд своими руками: Docker, образ, compose, `.env`, скрипты bash](https://hammerhall.io/ledger/articles/6-stand) | [md](articles/06-stand.md) | [пример](examples/articles/06-stand) |
+| 7 | [События: JSON всерьёз — Jackson 3, `sealed`, `switch` по образцу, эталоны](https://hammerhall.io/ledger/articles/7-events-json) | [md](articles/07-events-json.md) | [пример](examples/articles/07-events-json) |
+| 8 | [Объекты-значения: приведение, проверки, маскировка](https://hammerhall.io/ledger/articles/8-value-objects) | [md](articles/08-value-objects.md) | [пример](examples/articles/08-value-objects) |
+| 9 | [Данные дальше: конвертеры JPA, JSON в столбце, выборки по времени, индексы](https://hammerhall.io/ledger/articles/9-data-further) | [md](articles/09-data-further.md) | [пример](examples/articles/09-data-further) |
+| 10 | [Метрики: счётчик, датчик, таймер, теги — и дежурство в игровой день](https://hammerhall.io/ledger/articles/10-metrics) | [md](articles/10-metrics.md) | [пример](examples/articles/10-metrics) |
+| 11 | [Тесты-сторожа: тесты, которые проверяют правила проекта](https://hammerhall.io/ledger/articles/11-guard-tests) | [md](articles/11-guard-tests.md) | [пример](examples/articles/11-guard-tests) |
+
+## От системы к делу
+
+Как правила дела — сроки, деньги, обещания людям — живут в коде.
+
+| № | Статья | Текст | Код |
+|---|---|---|---|
+| 12 | [Что делает CRM: следующий шаг с датой](https://hammerhall.io/ledger/articles/12-what-crm-does) | [md](articles/12-what-crm-does.md) | [пример](examples/articles/12-what-crm-does) |
+| 13 | [Статусы лида: какие ставит человек, а какой — только система](https://hammerhall.io/ledger/articles/13-lead-statuses) | [md](articles/13-lead-statuses.md) | [пример](examples/articles/13-lead-statuses) |
+| 14 | [Деньги в коде: копейки, скидки, округление](https://hammerhall.io/ledger/articles/14-money-in-code) | [md](articles/14-money-in-code.md) | [пример](examples/articles/14-money-in-code) |
+| 15 | [Правила продаж — в настройках](https://hammerhall.io/ledger/articles/15-sales-rules-in-settings) | [md](articles/15-sales-rules-in-settings.md) | [пример](examples/articles/15-sales-rules-in-settings) |
+| 16 | [Оплата, о которой никто не сообщил](https://hammerhall.io/ledger/articles/16-unreported-payment) | [md](articles/16-unreported-payment.md) | [пример](examples/articles/16-unreported-payment) |
+| 16а | [Задание без человека: почему ночной опрос получил бы `401`](https://hammerhall.io/ledger/articles/16a-job-without-a-person) | [md](articles/16a-job-without-a-person.md) | [пример](examples/articles/16a-job-without-a-person) |
+| 17 | [Lombok и MapStruct: код, который пишут за тебя](https://hammerhall.io/ledger/articles/17-lombok-and-mapstruct) | [md](articles/17-lombok-and-mapstruct.md) | [пример](examples/articles/17-lombok-and-mapstruct) |
+| 18 | [Миграции помнят решения](https://hammerhall.io/ledger/articles/18-migrations-remember) | [md](articles/18-migrations-remember.md) | [пример](examples/articles/18-migrations-remember) |
+
+## От красного к зелёному
+
+Как работать с тестами на проекте: писать их, читать красную сборку
+и верить зелёному тесту, только если видел его красным.
+
+| № | Статья | Текст | Код |
+|---|---|---|---|
+| 1 | [Зачем тесты и чего от тебя ждут на проекте](https://hammerhall.io/ledger/testing/1-why-tests) | [md](testing/01-why-tests.md) | [пример](examples/testing/01-why-tests) |
+| 2 | [Первый модульный тест: от пустого файла до зелёного отчёта](https://hammerhall.io/ledger/testing/2-first-test) | [md](testing/02-first-test.md) | [пример](examples/testing/02-first-test) |
+| 3 | [Тест покраснел: что делать](https://hammerhall.io/ledger/testing/3-red-test) | [md](testing/03-red-test.md) | [пример](examples/testing/03-red-test) |
+| 4 | [Какие случаи проверять](https://hammerhall.io/ledger/testing/4-which-cases) | [md](testing/04-which-cases.md) | [пример](examples/testing/04-which-cases) |
+| 5 | [Тест, который ничего не проверяет](https://hammerhall.io/ledger/testing/5-test-that-checks-nothing) | [md](testing/05-test-that-checks-nothing.md) | [пример](examples/testing/05-test-that-checks-nothing) |
+| 6 | [Когда вокруг твоего кода другой код](https://hammerhall.io/ledger/testing/6-stubs) | [md](testing/06-stubs.md) | [пример](examples/testing/06-stubs) |
+| 7 | [Тест с настоящей базой](https://hammerhall.io/ledger/testing/7-real-database) | [md](testing/07-real-database.md) | [пример](examples/testing/07-real-database) |
 
 ---
 

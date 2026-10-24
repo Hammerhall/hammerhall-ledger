@@ -114,6 +114,7 @@ suite_ok example.crm.CheckoutTest 11
 suite_ok example.crm.RublesTest 5
 suite_ok example.crm.FunnelNumbersTest 13
 suite_ok example.crm.TodayListTest 3
+suite_ok example.crm.ClubClientTest 21
 suite_ok example.gameday.journal.GameDayRulesTest 43
 note "у сторожа статьи 11 по-прежнему 43 запуска: в папку журнала ничего не попало, миграций не прибавилось"
 for cls in IncidentLogTest IncidentMetricsTest IncidentTest IncidentLogIT IncidentTableIT; do
