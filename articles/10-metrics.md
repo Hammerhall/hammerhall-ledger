@@ -586,7 +586,7 @@ curl -i http://127.0.0.1:8080/actuator/prometheus
 
 ```
 HTTP/1.1 401
-WWW-Authenticate: Basic realm="Realm"
+WWW-Authenticate: Basic realm="Realm", charset="UTF-8"
 …
 ```
 
@@ -694,9 +694,8 @@ Grafana метрик не хранит: каждая панель — запро
 при обрыве пропадают сразу все метрики приложения, а `NaN` — у одной.
 
 Проверь в песочнице. Останови базу (`docker stop game-day-db`) и
-спроси ручку метрик той же командой. Ответ придёт не сразу: датчик
-спрашивает базу, а приложение сперва ждёт подключения к ней. Потом
-строки таймера — прежние, а остальные такие:
+спроси ручку метрик той же командой. Датчик спросит базу, а её нет.
+Строки таймера — прежние, а остальные такие:
 
 ```
 gameday_incidents_open NaN
@@ -1246,7 +1245,7 @@ public class WeakDemo {
 5. `curl -u admin:admin-local http://127.0.0.1:8080/game-day/incidents`,
    затем ручка метрик — строка
    `http_server_requests_seconds_count{…,uri="/game-day/incidents"} 1`;
-6. `docker stop game-day-db`, ручка метрик — не сразу,
+6. `docker stop game-day-db`, ручка метрик —
    `gameday_incidents_open NaN`, в логе — `Failed to apply the value
    function`; приложение останови;
 7. что будет, если: убери `prometheus` из `include` — под `admin`

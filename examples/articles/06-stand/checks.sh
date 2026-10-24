@@ -151,7 +151,7 @@ if (cd "$v" && mvn -B -q -ntp -DskipTests package >/dev/null 2>&1); then
     if app_start "$v/$JAR" target/app-no-rule.log; then
         out=$(http "$LOCAL/actuator/health")
         expect_regex "$(status_of "$out")" '^HTTP/1\.1 401 ?$' "curl -i /actuator/health без правила — 401"
-        expect_regex "$out" '^WWW-Authenticate: Basic realm="Realm"$' "…с просьбой войти по Basic"
+        expect_regex "$out" '^WWW-Authenticate: Basic realm="Realm", charset="UTF-8"$' "…с просьбой войти по Basic"
         body=$(body_of "$out")
         expect_contains "$body" '"status":401' "тело — форма Boot: status 401"
         expect_contains "$body" '"error":"Unauthorized"' "…error Unauthorized"
@@ -388,38 +388,63 @@ if [ "$count" = 1 ]; then pass "в журнале снова одно проис
 expect_contains "$(docker compose logs game-day 2>&1)" 'Successfully applied 1 migration to schema "game_day"' \
     "Flyway опять применил миграцию: том новый"
 
-section "ENTRYPOINT строкой — сигнал до Java не доходит"
-v=$(make_variant entrypoint-string)
-sed -i 's|^ENTRYPOINT .*|ENTRYPOINT java -jar /app/app.jar|' "$v/Dockerfile"
-if (cd "$v" && docker build -q -t game-day:shell . >/dev/null 2>&1); then
-    docker run -d --rm --name game-day-shell --network "$NETWORK" \
+# Вариант образа с ENTRYPOINT строкой: собрать, запустить в сети стенда, дождаться старта, docker stop.
+# Печатает, сколько секунд шёл stop; код 1 — не собрался или не поднялся, тогда печатает причину.
+# Аргументы: имя варианта, строка ENTRYPOINT целиком.
+entrypoint_stop() {
+    local name=$1 line=$2 v i start started=""
+    v=$(make_variant "entrypoint-$name")
+    sed -i "s|^ENTRYPOINT .*|$line|" "$v/Dockerfile"
+    if ! grep -qxF -- "$line" "$v/Dockerfile"; then echo "строка ENTRYPOINT не легла"; return 1; fi
+    if ! (cd "$v" && docker build -q -t "game-day:$name" . >/dev/null 2>&1); then echo "образ не собрался"; return 1; fi
+    if ! docker run -d --rm --name "game-day-$name" --network "$NETWORK" \
         -e SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres \
         -e SPRING_DATASOURCE_USERNAME=postgres -e SPRING_DATASOURCE_PASSWORD="$DB_PASSWORD" \
-        game-day:shell >/dev/null
-    expect_ok $? "docker run в сети $NETWORK: базу по имени db видит и контейнер не из compose"
-    started=""
-    for _ in $(seq 120); do
-        if grep -q "Started GameDayApplication" <<<"$(docker logs game-day-shell 2>&1)"; then
+        "game-day:$name" >/dev/null; then
+        echo "docker run в сети $NETWORK не прошёл"
+        return 1
+    fi
+    for ((i = 0; i < 120; i++)); do
+        if grep -q "Started GameDayApplication" <<<"$(docker logs "game-day-$name" 2>&1)"; then
             started=yes
             break
         fi
         sleep 1
     done
-    if [ -n "$started" ]; then
-        start=$(date +%s)
-        docker stop game-day-shell >/dev/null
-        took=$(($(date +%s) - start))
-        if [ "$took" -ge 9 ]; then
-            pass "docker stop ждал $took с — Docker добил процесс через 10 с, как в статье"
-        else
-            fail "docker stop за $took с: оболочка передала сигнал — статью поправить"
-        fi
+    if [ -z "$started" ]; then
+        echo "не поднялся за 120 с: $(docker logs "game-day-$name" 2>&1 | tail -n 5)"
+        docker rm -f "game-day-$name" >/dev/null 2>&1
+        return 1
+    fi
+    start=$(date +%s)
+    docker stop "game-day-$name" >/dev/null
+    echo $(($(date +%s) - start))
+}
+
+ARTICLE6=${ROOT:-}/articles/06-stand.md
+section "ENTRYPOINT строкой, одна команда: sh в alpine заменяет себя Java — сигнал доходит"
+if took=$(entrypoint_stop shell 'ENTRYPOINT java -jar /app/app.jar'); then
+    if [ "$took" -lt 8 ]; then
+        pass "docker stop за $took с: главный процесс — Java, SIGTERM дошёл"
     else
-        fail "вариант с ENTRYPOINT строкой не поднялся за 120 с"
-        show "$(docker logs game-day-shell 2>&1 | tail -n 20)"
+        fail "docker stop ждал $took с, а статья говорит: одна команда — сигнал доходит"
     fi
 else
-    fail "вариант с ENTRYPOINT строкой не собрался"
+    fail "вариант ENTRYPOINT строкой: $took"
+fi
+
+section "ENTRYPOINT строкой с «; echo stopped»: главная — оболочка, Docker добивает Java через 10 с"
+if [ -f "$ARTICLE6" ]; then
+    expect_contains "$(cat "$ARTICLE6")" '`java -jar /app/app.jar; echo stopped`' "строка — та же, что в статье"
+fi
+if took=$(entrypoint_stop shell-tail 'ENTRYPOINT java -jar /app/app.jar; echo stopped'); then
+    if [ "$took" -ge 9 ]; then
+        pass "docker stop ждал $took с: оболочка сигнал не передала, Docker добил Java через 10 с"
+    else
+        fail "docker stop за $took с, а статья говорит: оболочка сигнал не передаст"
+    fi
+else
+    fail "вариант с «; echo stopped»: $took"
 fi
 
 section "Том помнит пароль: новый пароль в .env — password authentication failed"

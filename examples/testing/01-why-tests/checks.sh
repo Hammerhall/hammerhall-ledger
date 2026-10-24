@@ -16,8 +16,11 @@ TEST_DIR=src/test/java/example/testy/score
 DEADLINE='2026-10-12T21:00:00Z'
 
 # Строка вывода целиком, как в статье; пробелы в конце строки не в счёт. Аргументы: вывод, строка, пояснение.
+# Без трубы в grep -q: при pipefail ранний выход grep обрывает sed, и найденная строка считалась бы ненайденной.
 expect_line() {
-    if sed 's/[[:space:]]*$//' <<<"$1" | grep -qxF -- "$2"; then pass "$3"; else fail "$3: нет строки «$2»"; fi
+    local trimmed
+    trimmed=$(sed 's/[[:space:]]*$//' <<<"$1")
+    if grep -qxF -- "$2" <<<"$trimmed"; then pass "$3"; else fail "$3: нет строки «$2»"; fi
 }
 
 # Итог «Tests run: …» из раздела Results и строка BUILD — для сводки. Аргумент: вывод mvn.
@@ -104,7 +107,8 @@ if expect_changed "$v/$SCORE" "$SCORE" "if (submittedAt.isBefore(deadline))"; th
     out=$(cd "$v" && mvn -B -ntp test 2>&1); code=$?
     expect_failed "$code" "mvn test с isBefore"
     expect_line "$out" "[ERROR] Tests run: 2, Failures: 1, Errors: 0, Skipped: 0" "Tests run: 2, Failures: 1"
-    expect_line "$out" "[INFO] BUILD FAILURE" "BUILD FAILURE"
+    # Maven 3 (обёртка start.spring.io) пишет [INFO] BUILD FAILURE, Maven 4 — [ERROR]; статья — «примерно так».
+    expect_regex "$out" '^\[(INFO|ERROR)\] BUILD FAILURE$' "BUILD FAILURE"
     expect_contains "$out" "onDeadlineIsStillOnTime" "красный — тест «ровно в срок»"
     expect_line "$out" "expected: 100" "expected: 100"
     expect_line "$out" " but was: 50" " but was: 50"

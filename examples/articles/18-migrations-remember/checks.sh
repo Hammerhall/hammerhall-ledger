@@ -73,7 +73,7 @@ article_block() {
 apply() { (cd "$SQL" && docker exec -i "$DB" psql -U postgres -v ON_ERROR_STOP=1 -1 -f - <"$1" 2>&1); }
 
 # check.sql — командой из статьи, без ON_ERROR_STOP.
-run_check() { (cd "$SQL" && docker exec -i "$DB" psql -U postgres -f - <"${1:-check.sql}" 2>&1); }
+run_check() { (cd "$SQL" && docker exec -i "$DB" psql -U postgres -f - <check.sql 2>&1); }
 
 # Одно значение без рамок таблицы. Аргумент: запрос.
 psql_value() { docker exec "$DB" psql -X -U postgres -tA -c "$1" 2>&1; }
@@ -130,7 +130,7 @@ expect_regex "$(find src/main/resources/db/migration -name '*.sql' | grep -c '')
 expect_regex "$(find src/main/java/example/gameday/journal -name '*.java' | grep -c '')" '^18$' \
     "в папке журнала по-прежнему 18 файлов"
 expect_regex "$(find src/main/java/example/crm -name '*.java' | grep -c ''):$(find src/test/java/example/crm -name '*.java' | grep -c '')" \
-    '^14:7$' "в example.crm по-прежнему 14 классов и 7 тестов: Java статья не добавляет"
+    '^17:8$' "в example.crm по-прежнему 17 классов и 8 тестов (с 16а): Java статья не добавляет"
 expect_regex "$(find target -name '*open_day*' | grep -c '')" '^0$' \
     "в target нет ни одного файла open-day: сборка и Flyway папку не видят"
 expect_regex "$(sed -n '/^## Пример целиком/,$p' "$ARTICLE" | grep -c '^```java')" '^0$' \

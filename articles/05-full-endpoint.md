@@ -399,7 +399,8 @@ Authorization: Basic YWRtaW46YWRtaW4tbG9jYWw=
 не собирают. У `curl` для этого ключ `-u admin:admin-local`, в тесте
 есть `httpBasic("admin", "admin-local")` (часть 4). Не вошёл или пароль
 не тот — охрана отвечает `401` с заголовком
-`WWW-Authenticate: Basic realm="Realm"`: «войди по Basic».
+`WWW-Authenticate: Basic realm="Realm", charset="UTF-8"`: «войди по Basic,
+имя и пароль — в UTF-8».
 
 🔴 base64 — не шифр: `echo YWRtaW46YWRtaW4tbG9jYWw= | base64 -d`
 напечатает пароль. Кто видит запрос, видит и пароль. Поэтому Basic без
@@ -1082,7 +1083,7 @@ curl -i -u viewer:viewer-local "http://localhost:8080/game-day/incidents"
 
 ```
 HTTP/1.1 401
-WWW-Authenticate: Basic realm="Realm"
+WWW-Authenticate: Basic realm="Realm", charset="UTF-8"
 …
 
 {"timestamp":"…","status":401,"error":"Unauthorized","path":"/game-day/incidents"}
