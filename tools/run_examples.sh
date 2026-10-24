@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Собирает примеры статей и проверяет то, что статьи обещают словами.
 # Сначала разложить примеры: python3 tools/extract_examples.py
-# Запуск из корня репозитория: bash tools/run_examples.sh
+# Запуск из корня репозитория: bash tools/run_examples.sh — все разложенные примеры;
+# bash tools/run_examples.sh articles/06-stand — только названные. Так зовёт CI: у каждого примера
+# своя задача, и красный пример не красит задачи тех, что стоят на нём, — их base только раскладывается.
 set -uo pipefail
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
@@ -14,10 +16,23 @@ if [ ! -d "$BUILD" ]; then
     exit 2
 fi
 
+poms=()
+if [ "$#" -gt 0 ]; then
+    for name in "$@"; do
+        if [ ! -f "$BUILD/$name/pom.xml" ]; then
+            echo "Нет $BUILD/$name/pom.xml — сначала: python3 tools/extract_examples.py $name" >&2
+            exit 2
+        fi
+        poms+=("$BUILD/$name/pom.xml")
+    done
+else
+    mapfile -t poms < <(find "$BUILD" -name pom.xml -not -path '*/target/*' | sort)
+fi
+
 failed=0
 echo "## Примеры статей" >>"$SUMMARY"
 
-while IFS= read -r pom; do
+for pom in "${poms[@]}"; do
     dir=$(dirname "$pom")
     name=${dir#"$BUILD"/}
     echo
@@ -37,7 +52,7 @@ while IFS= read -r pom; do
         (cd "$dir" && source "$ROOT/tools/checks_lib.sh" && source ./checks.sh && exit "$FAILED")
         failed=$((failed + $?))
     fi
-done < <(find "$BUILD" -name pom.xml -not -path '*/target/*' | sort)
+done
 
 echo
 if [ "$failed" -eq 0 ]; then
