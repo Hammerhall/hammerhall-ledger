@@ -1,0 +1,9 @@
+{
+  "article": "en/articles/02-spring-boot-4.md",
+  "base": "en/articles/01-why-spring",
+  "delete": [
+    "src/main/java/example/gameday/journal/GameDayApp.java",
+    "src/main/java/example/gameday/journal/HandMadeApp.java",
+    "src/main/resources/application.properties"
+  ]
+}

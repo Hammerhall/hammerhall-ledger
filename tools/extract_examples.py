@@ -26,6 +26,10 @@
 `` `src/test/resources/x.json`: ``. Кусок файла («pom.xml: в <dependencies>…»)
 не берётся: в проекте свой pom.xml.
 
+Английская редакция — то же самое: examples/en/<раздел>/<пример>/example.json
+ссылается на en/<раздел>/<файл>.md, раздел кода в ней — «## The full example,
+with imports», дописывание — « — append to the end».
+
 Запуск из корня репозитория: python3 tools/extract_examples.py
 """
 import json
@@ -39,7 +43,8 @@ ROOT = Path(__file__).resolve().parent.parent
 EXAMPLES = ROOT / "examples"
 BUILD = Path(os.environ.get("EXAMPLES_BUILD", ROOT / "build" / "examples"))
 
-FULL_EXAMPLE = re.compile(r"^## Пример целиком")
+# Английская редакция (en/…) зовёт раздел «The full example, with imports».
+FULL_EXAMPLE = re.compile(r"^## (?:Пример целиком|The full example)")
 NEXT_SECTION = re.compile(r"^## ")
 FENCE = re.compile(r"^```")
 PATH_LINE = re.compile(
@@ -47,7 +52,7 @@ PATH_LINE = re.compile(
     r"(?P<path>Dockerfile|[\w.-]*(?:/[\w.-]+)*\.[\w]+|\.[\w.-]+)"
     r"(?P<rest>\s+—\s+.*?)?\s*(?:-->)?\s*$"
 )
-APPEND = "дописать"
+APPEND = ("дописать", "append")              # «— дописать в конец» / «— append to the end»
 PATH_ABOVE = re.compile(r"^`(?P<path>[\w.-]*(?:/[\w.-]+)*\.\w+)`:\s*$")
 
 
@@ -66,7 +71,7 @@ def file_of(block: list[str], above: str) -> tuple[str, str, bool] | None:
     match = PATH_LINE.match(block[0]) if block else None
     if match:
         path = match.group("path")
-        if APPEND in (match.group("rest") or ""):
+        if any(word in (match.group("rest") or "") for word in APPEND):
             return path, text(block[1:]), True
         if path.endswith(".xml") or block[0].lstrip().startswith("<!--"):
             return path, text(block[1:]), False

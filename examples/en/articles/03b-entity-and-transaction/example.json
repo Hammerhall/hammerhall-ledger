@@ -1,0 +1,8 @@
+{
+  "article": "en/articles/03b-entity-and-transaction.md",
+  "base": "en/articles/03a-table-and-migration",
+  "delete": [
+    "src/test/java/example/gameday/journal/IncidentLogTest.java",
+    "src/test/java/example/gameday/journal/RememberingNotifier.java"
+  ]
+}

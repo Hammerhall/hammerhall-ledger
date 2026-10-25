@@ -8,6 +8,8 @@
 
 **Читать удобнее на сайте → [hammerhall.io/ledger](https://hammerhall.io/ledger)**
 
+**English edition → [en/README.md](en/README.md)** · [hammerhall.io/en/ledger](https://hammerhall.io/en/ledger)
+
 Здесь лежат те же тексты в Markdown. Ссылки внутри статей ведут на сайт:
 там соседние статьи и задачи для практики. Код из статей —
 в [`examples/`](examples/): его собирает и запускает каждый прогон.

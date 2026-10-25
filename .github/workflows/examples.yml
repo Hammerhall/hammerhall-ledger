@@ -9,6 +9,7 @@ on:
     paths:
       - "articles/**"
       - "testing/**"
+      - "en/**"
       - "examples/**"
       - "tools/**"
       - ".github/workflows/examples.yml"
