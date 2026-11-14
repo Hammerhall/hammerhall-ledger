@@ -3,8 +3,7 @@
 [![Примеры статей](https://github.com/Hammerhall/hammerhall-ledger/actions/workflows/examples.yml/badge.svg)](https://github.com/Hammerhall/hammerhall-ledger/actions/workflows/examples.yml)
 
 Статьи для Java-джунов от Hammerhall: Stream API шаг за шагом,
-алгоритмы на стримах, дорога к Spring Boot, тесты — и истории слов,
-на которых говорят программисты.
+алгоритмы на стримах, дорога к Spring Boot, тесты.
 
 **Читать удобнее на сайте → [hammerhall.io/ledger](https://hammerhall.io/ledger)**
 
@@ -126,26 +125,11 @@ Spring Boot 4, как приложение хранит данные и отве
 
 ---
 
-# Темы
+# Истории слов
 
-## Истории слов
-
-Откуда взялись слова, на которых говорит команда. Не определения,
-а истории — минут на пять, читать в любом порядке. Для всех, не только
-для программистов.
-
-| № | История | Текст |
-|---|---|---|
-| 1 | [Кука: как забывчивому интернету выдали номерок](https://hammerhall.io/ledger/words/1-cookie) | [md](words/01-cookie.md) |
-| 2 | [Ключ Bearer: «обещаю заплатить предъявителю»](https://hammerhall.io/ledger/words/2-bearer) | [md](words/02-bearer.md) |
-| 3 | [Мёртвые письма: комната, где чужое письмо вскрывали по закону](https://hammerhall.io/ledger/words/3-dead-letters) | [md](words/03-dead-letters.md) |
-| 4 | [Идемпотентность: слово, которого не было в словаре](https://hammerhall.io/ledger/words/4-idempotency) | [md](words/04-idempotency.md) |
-| 5 | [Баг: первый настоящий жук](https://hammerhall.io/ledger/words/5-bug) | [md](words/05-bug.md) |
-| 6 | [Пул-реквест: просьба втянуть](https://hammerhall.io/ledger/words/6-pull-request) | [md](words/06-pull-request.md) |
-| 7 | [Канбан: вывеска, карточка, доска](https://hammerhall.io/ledger/words/7-kanban) | [md](words/07-kanban.md) |
-| 8 | [Докер: ящик, которому всё равно, что внутри](https://hammerhall.io/ledger/words/8-docker) | [md](words/08-docker.md) |
-| 9 | [Ментор: друг, которого сыграла богиня](https://hammerhall.io/ledger/words/9-mentor) | [md](words/09-mentor.md) |
-| 10 | [Бэклог: бревно, которое держит огонь](https://hammerhall.io/ledger/words/10-backlog) | [md](words/10-backlog.md) |
+Переехали в газету «Доброе утро, Мидгард» — с теми же словами в адресах:
+[gm.hammerhall.io/words](https://gm.hammerhall.io/words). Исходники — в
+[hammerhall-gm](https://github.com/Hammerhall/hammerhall-gm).
 
 ---
 

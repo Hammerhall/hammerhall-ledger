@@ -4,7 +4,7 @@
 
 ## Тексты — CC BY-NC-SA 4.0
 
-Статьи и истории (`articles/`, `streams/`, `algorithms/`, `words/`)
+Статьи (`articles/`, `streams/`, `algorithms/`)
 и README распространяются по лицензии
 [Creative Commons «Атрибуция — Некоммерческое использование — На тех же
 условиях» 4.0 Международная](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.ru)
