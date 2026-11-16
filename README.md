@@ -125,14 +125,6 @@ Spring Boot 4, как приложение хранит данные и отве
 
 ---
 
-# Истории слов
-
-Переехали в газету «Доброе утро, Мидгард» — с теми же словами в адресах:
-[gm.hammerhall.io/words](https://gm.hammerhall.io/words). Исходники — в
-[hammerhall-gm](https://github.com/Hammerhall/hammerhall-gm).
-
----
-
 ## Прочитал — закрепи
 
 К статьям о стримах есть задачи в кузнице **Stream Forge**, часть из них
